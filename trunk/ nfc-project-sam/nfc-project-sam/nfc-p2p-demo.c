@@ -55,11 +55,11 @@ int main (int argc, char *argv[])
 	if (llcp_init () < 0)
 	errx (EXIT_FAILURE, "llcp_init()");
 
-	llcp_log_log("[nfc-project.c]", LLC_PRIORITY_WARN, "This is a test warning message");
-	llcp_log_log("[nfc-project.c]", LLC_PRIORITY_FATAL, "This is a test fatal message");
-	llcp_log_log("[nfc-project.c]", LLC_PRIORITY_TRACE, "This is a test trace message");
-	llcp_log_log("[nfc-project.c]", LLC_PRIORITY_DEBUG, "This is a test debug message");
-	llcp_log_log("[nfc-project.c]", LLC_PRIORITY_ERROR, "This is a test error message");
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_WARN, "This is a test warning message");
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "This is a test fatal message");
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_TRACE, "This is a test trace message");
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "This is a test debug message");
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_ERROR, "This is a test error message");
 
 
 	nfc_connstring device_connstring[1];
@@ -94,12 +94,15 @@ int main (int argc, char *argv[])
 
 	if (!my_mac_link) errx (EXIT_FAILURE, "Cannot establish MAC link");
 
+
 	//Active mac_link as target
 	res = mac_link_activate_as_target(my_mac_link);
 	if (res <= 0) errx (EXIT_FAILURE, "Cannot activate link");
 
+
 	//const uint8_t *myLTO = 0x010104;	//2000msec(C8) 1byte(01) LTO(04)
 	//llc_link_configure(my_llc_link, &myLTO, 3);
+
 
 
 	//Wait for mac_link to finish
