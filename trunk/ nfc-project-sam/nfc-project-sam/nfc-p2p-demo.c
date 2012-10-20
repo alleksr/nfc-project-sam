@@ -18,36 +18,6 @@
 
 #include "llcp_log.h"
 
-
-void *
-server_accept_thread (void *arg)
-{
-    llcp_log_log("[nfc-project.c]", LLC_PRIORITY_WARN, "In server_accept_thread");
-
-    struct llc_connection *connection = (struct llc_connection *) arg;
-    sleep (1);
-    llc_connection_accept (connection);
-    return NULL;
-}
-
-void *
-server_thread (void *arg)
-{
-
-    llcp_log_log("[nfc-project.c]", LLC_PRIORITY_WARN, "In server_thread");
-
-    struct llc_connection *connection = (struct llc_connection *) arg;
-    uint8_t buffer[1024];
-
-    int len;
-    if ((len = llc_connection_recv (connection, buffer, sizeof (buffer), NULL)) < 0)
-        return NULL;
-
-
-    llc_connection_stop (connection);
-    return NULL;
-}
-
 int main (int argc, char *argv[])
 {
 	nfc_init(NULL);
