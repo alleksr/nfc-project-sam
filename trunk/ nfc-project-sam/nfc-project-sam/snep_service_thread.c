@@ -36,51 +36,30 @@ snep_service_thread (void *arg) {
     if ((len = llc_connection_recv (connection, buffer, sizeof (buffer), NULL)) < 0)
         return NULL;
 
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Received %s bytes", len);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Received %d bytes", len);
 
-    if (len < 10) // NPP's header (5 bytes)  and NDEF entry header (5 bytes)
-        return NULL;
 
-    size_t n = 0;
-
-    // Header
-    fprintf (info_stream, "NDEF Push Protocol version: %02x\n", buffer[n]);
-    if (buffer[n++] != 0x01) // Protocol version
-        return NULL; // Protocol not version supported
-
-    uint32_t ndef_entries_count = be32toh (*((uint32_t *)(buffer + n))); // Number of NDEF entries
-    fprintf (info_stream, "NDEF entries count: %u\n", ndef_entries_count);
-    if (ndef_entries_count != 1) // In version 0x01 of the specification, this value will always be 0x00, 0x00, 0x00, 0x01.
-        return NULL;
-    n += 4;
-
-    // NDEF Entry
-    if (buffer[n++] != 0x01) // Action code
-        return NULL; // Action code not supported
-
-    uint32_t ndef_length = be32toh (*((uint32_t *)(buffer + n))); // NDEF length
-    n += 4;
-
-    if ((len - n) < ndef_length)
-        return NULL; // Less received bytes than expected ?
-
-    char ndef_msg[1024];
-    //shexdump (ndef_msg, buffer + n, ndef_length);
-    fprintf (info_stream, "NDEF entry received (%u bytes): %s\n", ndef_length, ndef_msg);
-
-    if (ndef_stream) {
-        if (fwrite (buffer + n, 1, ndef_length, ndef_stream) != ndef_length) {
-            fprintf (stderr, "Could not write to file.\n");
-            fclose (ndef_stream);
-            ndef_stream = NULL;
-        } else {
-            fclose (ndef_stream);
-            ndef_stream = NULL;
-        }
+    int i = 0;
+    int offset = 9;
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Printing data");
+    for(i=0; i<68; i++) {
+        printf("%c", buffer[offset+i]);
     }
-    // TODO Stop the LLCP when this is reached
+    printf("\n");
+
+    uint8_t success_response[6] = { 0x10, 0x81, 0x00, 0x00, 0x00, 0x00 };	//Version - Success - Data Length = 0
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Sending success response via SNEP");
+    llc_connection_send(connection, success_response, sizeof(success_response));
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
+    struct llc_link *my_llc_link = connection->link;
+    //llc_link_deactivate(my_llc_link);
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Stopping llc_connection");
     llc_connection_stop (connection);
 
     return NULL;
+
 }
 
