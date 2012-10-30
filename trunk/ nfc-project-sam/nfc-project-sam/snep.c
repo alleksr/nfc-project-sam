@@ -28,10 +28,13 @@ struct snep_message *snep_unpack(const uint8_t *buffer, size_t len) {
 	return msg;
 }
 
-int snep_create_success_response(uint8_t *buffer) {
+uint8_t *snep_create_success_response(int *length) {
 
 	//buffer = { SNEP_VERSION, RESPONSE_SUCCESS, 0x00, 0x00, 0x00, 0x00 };
-	printf("in function");
+	//buffer = malloc(6 * sizeof(uint8_t));
+
+	uint8_t *buffer = malloc(6);
+
 	buffer[0] = SNEP_VERSION;
 	buffer[1] = RESPONSE_SUCCESS;
 	buffer[2] = 0x00;
@@ -39,7 +42,8 @@ int snep_create_success_response(uint8_t *buffer) {
 	buffer[4] = 0x00;
 	buffer[5] = 0x00;
 
-	return 6;
+	length = 6;
+	return buffer;
 }
 
 static inline uint8_t * memdup (const uint8_t *mem, size_t len)

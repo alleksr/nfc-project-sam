@@ -54,13 +54,11 @@ snep_service_thread (void *arg) {
 
 
 
-
-    uint8_t success_response[6]; 	//Version - Success - Data Length = 0
-    snep_create_success_response(success_response);
-
+    int *length = 0;
+    uint8_t *success_response = snep_create_success_response(length);
 
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Sending success response via SNEP");
-    llc_connection_send(connection, success_response, sizeof(success_response));
+    llc_connection_send(connection, success_response, 6);
 
 
     struct llc_link *my_llc_link = connection->link;
