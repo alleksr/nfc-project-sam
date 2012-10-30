@@ -14,6 +14,7 @@
 #include "llcp_parameters.h"
 #include "llc_connection.h"
 
+#include "snep.h"
 
 //To enable the llcp_log_log function.
 //Must be defined before the include of llcp_log.h !!!!!!!!!!!!
@@ -25,8 +26,6 @@ void *
 snep_service_thread (void *arg) {
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] started!");
-	FILE* info_stream = NULL;
-	FILE* ndef_stream = NULL;
 
     struct llc_connection *connection = (struct llc_connection *) arg;
     uint8_t buffer[1024];
@@ -39,25 +38,38 @@ snep_service_thread (void *arg) {
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Received %d bytes", len);
 
 
+
+    struct snep_message *msg = snep_unpack(buffer, sizeof(buffer));
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] snep version: %i.%i", msg->major_version, msg->minor_version);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] snep request type: %i", msg->type_field);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] data length: %i bytes", msg->data_length);
+
     int i = 0;
-    int offset = 9;
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Printing data");
-    for(i=0; i<68; i++) {
-        printf("%c", buffer[offset+i]);
+    for(i=0; i<msg->data_length; i++) {
+        printf("%c", msg->ndef_message[i]);
     }
     printf("\n");
 
-    uint8_t success_response[6] = { 0x10, 0x81, 0x00, 0x00, 0x00, 0x00 };	//Version - Success - Data Length = 0
+
+
+
+    uint8_t success_response[6]; 	//Version - Success - Data Length = 0
+    snep_create_success_response(success_response);
+
 
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Sending success response via SNEP");
     llc_connection_send(connection, success_response, sizeof(success_response));
 
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
+
     struct llc_link *my_llc_link = connection->link;
-    //llc_link_deactivate(my_llc_link);
 
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Stopping llc_connection");
     llc_connection_stop (connection);
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
+    llc_link_deactivate(my_llc_link);
 
     return NULL;
 

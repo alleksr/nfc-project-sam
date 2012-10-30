@@ -15,6 +15,7 @@
 #include "llc_connection.h"
 #include "snep_service_thread.h"
 
+#include "chips/pn53x.h"
 
 //To enable the llcp_log_log function.
 //Must be defined before the include of llcp_log.h !!!!!!!!!!!!
@@ -53,7 +54,8 @@ int main (int argc, char *argv[])
 	//Create llc_link
 	struct llc_link *my_llc_link = llc_link_new ();
 
-
+	const uint8_t *myLTO = 0x100104;	//2000msec(C8) 1byte(01) LTO(04)
+	llc_link_configure(my_llc_link, &myLTO, 3);
 
 
 	struct llc_service *snep_service;
@@ -63,20 +65,14 @@ int main (int argc, char *argv[])
 		errx (EXIT_FAILURE, "llc_service_new_with_uri()");
 	}
 
-	const uint8_t *myLTO = 0x100104;	//2000msec(C8) 1byte(01) LTO(04)
-	llc_link_configure(my_llc_link, &myLTO, 3);
-
 	//Create mac_link
 	struct mac_link *my_mac_link = mac_link_new (device, my_llc_link);
 
 	if (!my_mac_link) errx (EXIT_FAILURE, "Cannot establish MAC link");
 
-
-
 	//Active mac_link as target
 	res = mac_link_activate_as_target(my_mac_link);
 	if (res <= 0) errx (EXIT_FAILURE, "Cannot activate link");
-
 
 
 	//Wait for mac_link to finish

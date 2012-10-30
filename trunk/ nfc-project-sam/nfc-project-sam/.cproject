@@ -31,6 +31,7 @@
 <option id="gnu.c.compiler.option.include.paths.1459975637" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/home/libnfc-llcp/libnfc-llcp"/>
 <listOptionValue builtIn="false" value="/usr/local/lib"/>
+<listOptionValue builtIn="false" value="/home/libnfc-read-only/libnfc"/>
 </option>
 <inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.955129708" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 </tool>
@@ -49,7 +50,7 @@
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1346618520" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.353106994" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
-<option id="gnu.both.asm.option.include.paths.736369342" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
+<option id="gnu.both.asm.option.include.paths.736369342" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
 <inputType id="cdt.managedbuild.tool.gnu.assembler.input.36149575" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 </tool>
 </toolChain>
