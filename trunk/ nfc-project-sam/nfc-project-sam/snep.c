@@ -2,7 +2,7 @@
  * snep.c
  *
  *  Created on: 30-okt-2012
- *      Author: sam
+ *      Author: Sam Van Den  Berge
  */
 
 #include <sys/types.h>
@@ -13,6 +13,11 @@
 
 #include "snep.h"
 
+//To enable the llcp_log_log function.
+//Must be defined before the include of llcp_log.h !!!!!!!!!!!!
+#define DEBUG 1
+
+#include "llcp_log.h"
 
 struct snep_message *snep_unpack(const uint8_t *buffer, size_t len) {
 	struct snep_message *msg;
@@ -25,14 +30,14 @@ struct snep_message *snep_unpack(const uint8_t *buffer, size_t len) {
 		msg->ndef_message = memdup (&buffer[SNEP_HEADER_LENGTH], msg->data_length);
 	}
 
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep.c] snep version: %i.%i", msg->major_version, msg->minor_version);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep.c] snep request type: %i", msg->type_field);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep.c] data length: %i bytes", msg->data_length);
+
 	return msg;
 }
 
 uint8_t *snep_create_success_response(int *length) {
-
-	//buffer = { SNEP_VERSION, RESPONSE_SUCCESS, 0x00, 0x00, 0x00, 0x00 };
-	//buffer = malloc(6 * sizeof(uint8_t));
-
 	uint8_t *buffer = malloc(6);
 
 	buffer[0] = SNEP_VERSION;
@@ -42,7 +47,7 @@ uint8_t *snep_create_success_response(int *length) {
 	buffer[4] = 0x00;
 	buffer[5] = 0x00;
 
-	length = 6;
+	*length = 6;
 	return buffer;
 }
 

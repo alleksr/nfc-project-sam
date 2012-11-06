@@ -2,7 +2,7 @@
  * snep.h
  *
  *  Created on: 30-okt-2012
- *      Author: sam
+ *      Author: Sam Van Den  Berge
  */
 
 #ifndef SNEP_H_
@@ -11,6 +11,7 @@
 #include <sys/types.h>
 
 #include <stdint.h>
+#include "ndef.h"
 
 #define SNEP_VERSION_POS      			   0
 #define SNEP_TYPE_POS         			   1
@@ -48,8 +49,6 @@ uint32_t ReadUint32FromBuffer(const uint8_t* pBuffer);
 struct snep_message *snep_unpack(const uint8_t *buffer, size_t len);
 uint8_t *snep_create_success_response(int *length);
 static inline uint8_t * memdup (const uint8_t *mem, size_t len);
-
-
 
 
 #endif /* SNEP_H_ */

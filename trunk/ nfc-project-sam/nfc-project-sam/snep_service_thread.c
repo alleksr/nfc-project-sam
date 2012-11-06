@@ -15,6 +15,7 @@
 #include "llc_connection.h"
 
 #include "snep.h"
+#include "ndef.h"
 
 //To enable the llcp_log_log function.
 //Must be defined before the include of llcp_log.h !!!!!!!!!!!!
@@ -41,24 +42,28 @@ snep_service_thread (void *arg) {
 
     struct snep_message *msg = snep_unpack(buffer, sizeof(buffer));
 
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] snep version: %i.%i", msg->major_version, msg->minor_version);
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] snep request type: %i", msg->type_field);
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] data length: %i bytes", msg->data_length);
+    struct ndef_record *record = ndef_unpack(msg->ndef_message, msg->data_length);
 
-    int i = 0;
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Printing data");
-    for(i=0; i<msg->data_length; i++) {
-        printf("%c", msg->ndef_message[i]);
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] NDEF Type:");
+    int i=0;
+    for(i=0; i<record->type_length; i++) {
+    	printf("%c", record->type[i]);
     }
     printf("\n");
 
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] NDEF Payload:");
+	for(i=0; i<record->payload_length; i++) {
+		printf("%c", record->payload[i]);
+	}
+	printf("\n");
 
+    if(msg->type_field == REQUEST_PUT ) {
+    	int length = -1;
+		uint8_t *success_response = snep_create_success_response(&length);
 
-    int *length = 0;
-    uint8_t *success_response = snep_create_success_response(length);
-
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Sending success response via SNEP");
-    llc_connection_send(connection, success_response, 6);
+		llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] Sending success response via SNEP");
+		llc_connection_send(connection, success_response, 6);
+    }
 
 
     struct llc_link *my_llc_link = connection->link;
