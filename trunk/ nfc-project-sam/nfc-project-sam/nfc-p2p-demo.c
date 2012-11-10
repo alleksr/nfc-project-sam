@@ -71,7 +71,7 @@ int main (int argc, char *argv[])
 	if (!my_mac_link) errx (EXIT_FAILURE, "Cannot establish MAC link");
 
 	//Active mac_link as target
-	res = mac_link_activate_as_target(my_mac_link);
+	res = mac_link_activate_as_initiator(my_mac_link);
 	if (res <= 0) errx (EXIT_FAILURE, "Cannot activate link");
 
 
