@@ -37,16 +37,29 @@ int main (int argc, char *argv[])
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_ERROR, "This is a test error message");
 
 
+	int res;
+
+	//Auto probe for nfc device
+	/*
 	nfc_connstring device_connstring[1];
 
-	int res;
 	res = nfc_list_devices (NULL, device_connstring, 1);
-
 	if (res < 1) errx (EXIT_FAILURE, "Sorry, no NFC device found");
 
 	//Create nfc_device
 	nfc_device *device;
+
 	if (!(device = nfc_open (NULL, device_connstring[0]))) {
+		errx (EXIT_FAILURE, "Cannot connect to NFC device");
+	}
+	*/
+
+
+	//Create nfc_device
+	nfc_device *device;
+
+	//if (!(device = nfc_open (NULL, device_connstring[0]))) {
+	if (!(device = nfc_open (NULL, "pn532_uart:/dev/ttyUSB0:115200"))) {
 		errx (EXIT_FAILURE, "Cannot connect to NFC device");
 	}
 
