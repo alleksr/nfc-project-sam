@@ -43,10 +43,42 @@ snep_send_thread (void *arg) {
 		0x74, 0x47, 0x30, 0x23, 0x74, 0x3d, 0x32, 0x2e, 0x30
     };
 
+    struct ndef_record *beamRec;
+    if(beamRec = malloc(sizeof *beamRec)) {
+    	beamRec->MB = 1;
+    	beamRec->ME = 1;
+    	beamRec->CF = 0;
+    	beamRec->IL = 0;
+    	beamRec->TNF = 2;
+    	beamRec->SR = 1;
+    	beamRec->type = "application/com.example.android.beam";
+    	beamRec->type_length = strlen(beamRec->type);
+    	beamRec->payload = "Hello World to Sam :-)";
+    	beamRec->payload_length = strlen(beamRec->payload);
+    }
+
+    struct ndef_record *ytRec;
+	if(ytRec = malloc(sizeof *ytRec)) {
+		ytRec->MB = 1;
+		ytRec->ME = 1;
+		ytRec->CF = 0;
+		ytRec->IL = 0;
+		ytRec->TNF = 3;
+		ytRec->SR = 1;
+		ytRec->type = "http://www.youtube.com/watch?v=nCgQDjiotG0#t=1.0";
+		ytRec->type_length = strlen(ytRec->type);
+		ytRec->payload = "";
+		ytRec->payload_length = strlen(ytRec->payload);
+	}
+
+    uint8_t res_buffer[1024];
+
+    int len = snep_pack(ytRec, res_buffer);
+
     sleep (1);
 
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
-    llc_connection_send (connection, youtube_link, sizeof (youtube_link));
+    llc_connection_send (connection, res_buffer, len);
 
     llc_connection_stop (connection);
 

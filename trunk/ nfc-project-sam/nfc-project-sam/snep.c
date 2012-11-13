@@ -37,6 +37,17 @@ struct snep_message *snep_unpack(const uint8_t *buffer, size_t len) {
 	return msg;
 }
 
+int snep_pack(struct ndef_record *record, uint8_t *buffer) {
+	buffer[0] = SNEP_VERSION;
+	buffer[1] = REQUEST_PUT;
+	buffer[2] = 0x00;
+	buffer[3] = 0x00;
+	buffer[4] = 0x00;
+	uint8_t length = ndef_pack(record, &buffer[6]);
+	buffer[5] = length;
+	return (length + 6);
+}
+
 uint8_t *snep_create_success_response(int *length) {
 	uint8_t *buffer = malloc(6);
 

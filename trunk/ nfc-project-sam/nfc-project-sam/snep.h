@@ -47,6 +47,7 @@ struct snep_message {
 
 uint32_t ReadUint32FromBuffer(const uint8_t* pBuffer);
 struct snep_message *snep_unpack(const uint8_t *buffer, size_t len);
+int snep_pack(struct ndef_record *record, uint8_t *buffer);
 uint8_t *snep_create_success_response(int *length);
 static inline uint8_t * memdup (const uint8_t *mem, size_t len);
 

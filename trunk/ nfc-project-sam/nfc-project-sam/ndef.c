@@ -70,6 +70,25 @@ struct ndef_record *ndef_unpack(const uint8_t *buffer, size_t len) {
 }
 
 
+int ndef_pack(struct ndef_record *record, uint8_t *buffer) {
+
+	buffer[0] |= ((record->MB << 7) & MB_MASK) | ((record->ME << 6) & ME_MASK) | ((record->CF << 5) & CF_MASK) | ((record->SR << 4)& SR_MASK) | (record->TNF & TNF_MASK);
+	buffer[1] = record->type_length;
+
+	if(record->SR == 1 ) {
+		buffer[2] = record->payload_length;
+	}
+	else{
+		//TODO: implement if SR = 0 ( payload_length = 4 bytes ) NOTE: add ofset to all the rest
+	}
+
+	memcpy(&buffer[3], record->type, record->type_length);
+	memcpy(&buffer[3+record->type_length], record->payload, record->payload_length);
+
+	int len = (3 + record->type_length + record->payload_length);
+
+	return len;
+}
 
 
 

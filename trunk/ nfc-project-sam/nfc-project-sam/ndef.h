@@ -34,6 +34,7 @@ struct ndef_record {
 };
 
 struct ndef_record *ndef_unpack(const uint8_t *buffer, size_t len);
+int ndef_pack(struct ndef_record *record, uint8_t *buffer);
 static inline uint8_t * memdup (const uint8_t *mem, size_t len);
 
 #endif /* NDEF_H_ */

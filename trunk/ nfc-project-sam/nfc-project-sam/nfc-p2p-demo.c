@@ -101,6 +101,7 @@ int main (int argc, char *argv[])
 	if (res <= 0) errx (EXIT_FAILURE, "Cannot activate link");
 
 
+
 	//Create outgoing connection to send data
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating outgoing connection");
