@@ -70,27 +70,33 @@ snep_service_thread (void *arg) {
 
     struct llc_link *my_llc_link = connection->link;
 
-    /*
 
-	uint8_t answer[] = {0x10, 0x02, 0x00, 0x00, 0x00, 0x47, 0xd2, 0x24, 0x20, 0x61, 0x70,
-			0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x63, 0x6f, 0x6d, 0x2e, 0x65, 0x78, 0x61, 0x6d,
-			0x70, 0x6c, 0x65, 0x2e, 0x61, 0x6e, 0x64, 0x72, 0x6f, 0x69, 0x64, 0x2e, 0x62, 0x65, 0x61, 0x6d, 0x42, 0x65,
-			0x61, 0x6d, 0x20, 0x6d, 0x65, 0x20, 0x75, 0x70, 0x21, 0x0a, 0x0a, 0x42, 0x65, 0x61, 0x6d, 0x20, 0x54, 0x69,
-			0x6d, 0x65, 0x3a, 0x20, 0x31, 0x31, 0x3a, 0x34, 0x33, 0x3a, 0x32, 0x30
-	};
 
+    struct ndef_record *beamRec;
+    if((beamRec = malloc(sizeof *beamRec))) {
+    	beamRec->MB = 1;
+    	beamRec->ME = 1;
+    	beamRec->CF = 0;
+    	beamRec->IL = 0;
+    	beamRec->TNF = 2;
+    	beamRec->SR = 1;
+    	beamRec->type = (uint8_t *)"application/com.example.android.beam";
+    	beamRec->type_length = strlen((char *)beamRec->type);
+    	beamRec->payload = (uint8_t *)"Hello World to Sam :-)";
+    	beamRec->payload_length = strlen((char *)beamRec->payload);
+    }
+
+    len = snep_pack(beamRec, buffer);
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
-	llc_connection_send (connection, answer, sizeof (answer));
-
-    */
+	llc_connection_send (connection, buffer, len);
 
 
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Stopping llc_connection");
-    llc_connection_stop (connection);
+    //llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Stopping llc_connection");
+    //llc_connection_stop (connection);
 
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
-    llc_link_deactivate(my_llc_link);
+    //llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
+    //llc_link_deactivate(my_llc_link);
 
     return NULL;
 
