@@ -214,14 +214,11 @@ snep_service_thread (void *arg) {
 	}
 
 
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] sending disc pdu");
 
-    //struct llc_link *my_llc_link = connection->link;
+	struct pdu *disc_pdu = pdu_new(connection->remote_sap, PDU_DISC, connection->local_sap, 0, 0, 0, 0);
 
-    //llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Stopping llc_connection");
-    //llc_connection_stop (connection);
-
-    //llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "[snep_service_thread] Deactivating llc_link");
-    //llc_link_deactivate(my_llc_link);
+	llc_connection_send_pdu(connection, disc_pdu);
 
     return NULL;
 
