@@ -13,7 +13,6 @@
 #include "mac.h"
 #include "llcp_parameters.h"
 #include "llc_connection.h"
-#include "snep_service_thread.h"
 #include "snep_send_thread.h"
 
 #include "chips/pn53x.h"
