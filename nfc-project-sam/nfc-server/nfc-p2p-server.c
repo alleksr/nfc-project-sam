@@ -14,7 +14,6 @@
 #include "llcp_parameters.h"
 #include "llc_connection.h"
 #include "snep_service_thread.h"
-#include "snep_send_thread.h"
 
 #include "chips/pn53x.h"
 
@@ -78,20 +77,6 @@ int main (int argc, char *argv[])
 		errx (EXIT_FAILURE, "llc_service_new_with_uri()");
 	}
 
-
-
-	/*
-	//Create sending service
-	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating SNEP Send Service");
-	int sap = 0;
-	if (!(snep_service = llc_service_new_with_uri (NULL, snep_send_thread, LLCP_SNEP_URI, NULL))) errx (EXIT_FAILURE, "Cannot create snep_send service");
-		//Bind llc_service to llc_link
-		if ((sap = llc_link_service_bind (my_llc_link, snep_service, -1)) < 0) {
-			errx (EXIT_FAILURE, "llc_service_new_with_uri()");
-	}
-
-	*/
-
 	//Create mac_link
 	struct mac_link *my_mac_link = mac_link_new (device, my_llc_link);
 
@@ -101,23 +86,6 @@ int main (int argc, char *argv[])
 	res = mac_link_activate_as_initiator(my_mac_link);
 	if (res <= 0) errx (EXIT_FAILURE, "Cannot activate link");
 
-
-	/*
-	//Create outgoing connection to send data
-
-	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating outgoing connection");
-	struct llc_connection * con = llc_outgoing_data_link_connection_new_by_uri (my_llc_link, sap, LLCP_SNEP_URI);
-	if (!con)
-		errx (EXIT_FAILURE, "Cannot create llc_connection");
-
-	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Connecting to remote device");
-	if (llc_connection_connect (con) < 0)
-		errx (EXIT_FAILURE, "Cannot connect llc_connection");
-
-	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Waiting for connection to finish");
-	llc_connection_wait (con, NULL);
-
-	*/
 
 	//Wait for mac_link to finish
 	void *status;
