@@ -71,17 +71,6 @@ int main (int argc, char *argv[])
 	struct llc_service *snep_service;
 
 
-	/*
-	//Create receiving service!
-	if (!(snep_service = llc_service_new_with_uri (NULL, snep_service_thread, LLCP_SNEP_URI, NULL))) errx (EXIT_FAILURE, "Cannot create snep service");
-	//Bind llc_service to llc_link
-	if (llc_link_service_bind (my_llc_link, snep_service, LLCP_SNEP_SAP) < 0) {
-		errx (EXIT_FAILURE, "llc_service_new_with_uri()");
-	}
-	*/
-
-
-
 	//Create sending service
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating SNEP Send Service");
 	int sap = 0;
@@ -119,19 +108,17 @@ int main (int argc, char *argv[])
 	llc_connection_wait (con, NULL);
 
 
+	//Closing connection
 
-	//Wait for mac_link to finish
-	void *status;
-		mac_link_wait (my_mac_link, &status);
-
-		printf ("STATUS = %p\n", status);
+	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Deactivating active connection");
+	llc_link_deactivate(my_llc_link);
 
 	mac_link_free (my_mac_link);
 	llc_link_free (my_llc_link);
 
 	nfc_close (device);
 
-	llcp_fini ();
+	llcp_fini();
 	nfc_exit(NULL);
 	exit(EXIT_SUCCESS);
 

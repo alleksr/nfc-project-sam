@@ -139,29 +139,19 @@ snep_send_thread (void *arg) {
 
 		usleep(25000);
 
-
-
-		/************************* Sending Pong ***************************************/
-		/*
-
-		len = snep_pack(PongRec, res_buffer);
-
-		llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending Pong!");
-		llc_connection_send (connection, res_buffer, len);
-
-		//Receiving the SNEP Success response!
-		if ((len = llc_connection_recv (connection, res_buffer, sizeof (res_buffer), NULL)) < 0)
-				return NULL;
-		struct snep_message *msg2 = snep_unpack(res_buffer, len);
-		if(msg2->type_field == RESPONSE_SUCCESS) {
-			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "SNEP Response: Success" );
-		}else{
-			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "SNEP Response: Not success!!" );
-		}
-		*/
-
     } //end for i=0..5
-    //llc_connection_stop (connection);
+
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] sending disc pdu");
+
+    struct pdu *dm_pdu = pdu_new(connection->remote_sap, PDU_DISC, connection->local_sap, 0, 0, 0, 0);
+
+    llc_connection_send_pdu(connection, dm_pdu);
+
+    usleep(250000);
+
+    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Stopping connection");
+
 
     return NULL;
 
