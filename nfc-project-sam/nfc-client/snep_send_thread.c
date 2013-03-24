@@ -148,11 +148,6 @@ snep_send_thread (void *arg) {
 
     llc_connection_send_pdu(connection, dm_pdu);
 
-    usleep(250000);
-
-    llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Stopping connection");
-
-
     return NULL;
 
 }
