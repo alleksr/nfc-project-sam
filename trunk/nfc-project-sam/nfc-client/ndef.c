@@ -41,7 +41,7 @@ struct ndef_record *ndef_unpack(const uint8_t *buffer, size_t len) {
 
 		if(record->SR == 0 ) {
 			//This is not a short record => payload length = 32bit!
-			record->payload_length = ReadUint32FromBuffer(buffer[2]);
+			record->payload_length = ReadUint32FromBuffer(&buffer[2]);
 			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[ndef.c] Payload length (normal record): %i", record->payload_length);
 			payload_length_size = 4;
 		}
@@ -88,18 +88,5 @@ int ndef_pack(struct ndef_record *record, uint8_t *buffer) {
 	int len = (3 + record->type_length + record->payload_length);
 
 	return len;
-}
-
-
-
-static inline uint8_t * memdup (const uint8_t *mem, size_t len)
-{
-    uint8_t *res = NULL;
-
-    if (mem && (res = malloc (len))) {
-	memcpy (res, mem, len);
-    }
-
-    return res;
 }
 

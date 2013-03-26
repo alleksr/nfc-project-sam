@@ -62,21 +62,7 @@ uint8_t *snep_create_success_response(int *length) {
 	return buffer;
 }
 
-static inline uint8_t * memdup (const uint8_t *mem, size_t len)
-{
-    uint8_t *res = NULL;
-
-    if (mem && (res = malloc (len))) {
-	memcpy (res, mem, len);
-    }
-
-    return res;
-}
-
-
-uint32_t ReadUint32FromBuffer(
-         const uint8_t* pBuffer)
-{
+uint32_t ReadUint32FromBuffer(const uint8_t* pBuffer) {
    return (uint32_t)((((uint32_t)pBuffer[0]) << 24)
    | (((uint32_t)pBuffer[1]) << 16)
    | (((uint32_t)pBuffer[2]) << 8)
