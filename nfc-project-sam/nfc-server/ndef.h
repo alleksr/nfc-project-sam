@@ -9,6 +9,7 @@
 #define NDEF_H_
 
 #include <sys/types.h>
+#include <stdlib.h>
 
 #include <stdint.h>
 #define SR_MASK 		0b00010000
@@ -35,7 +36,16 @@ struct ndef_record {
 
 struct ndef_record *ndef_unpack(const uint8_t *buffer, size_t len);
 int ndef_pack(struct ndef_record *record, uint8_t *buffer);
-static inline uint8_t * memdup (const uint8_t *mem, size_t len);
+static inline uint8_t * memdup (const uint8_t *mem, size_t len)
+{
+    uint8_t *res = NULL;
+
+    if (mem && (res = malloc (len))) {
+	memcpy (res, mem, len);
+    }
+
+    return res;
+}
 
 #endif /* NDEF_H_ */
 
