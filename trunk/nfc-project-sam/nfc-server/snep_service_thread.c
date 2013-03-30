@@ -30,6 +30,7 @@ snep_service_thread (void *arg) {
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[snep_service_thread] started!");
 
     struct llc_connection *connection = (struct llc_connection *) arg;
+    struct timeval tvBegin, tvEnd, tvDiff;
     uint8_t buffer[1024];
     uint8_t send_buffer[1024];
     uint8_t res_buffer[1024];
@@ -45,27 +46,29 @@ snep_service_thread (void *arg) {
 		PingRec->SR = 1;
 		PingRec->type = (uint8_t *)"text/plain";
 		PingRec->type_length = strlen((char *)PingRec->type);
-		PingRec->payload = (uint8_t *)"Ping";
+		PingRec->payload = (uint8_t *)"Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping";
+		//PingRec->payload = (uint8_t *)"Ping Ping Ping Ping Ping";
 		PingRec->payload_length = strlen((char *)PingRec->payload);
 	}
 
 	struct ndef_record *PongRec;
-		if((PongRec = malloc(sizeof *PongRec))) {
-			PongRec->MB = 1;
-			PongRec->ME = 1;
-			PongRec->CF = 0;
-			PongRec->IL = 0;
-			PongRec->TNF = 2;
-			PongRec->SR = 1;
-			PongRec->type = (uint8_t *)"text/plain";
-			PongRec->type_length = strlen((char *)PongRec->type);
-			PongRec->payload = (uint8_t *)"Pong";
-			PongRec->payload_length = strlen((char *)PongRec->payload);
-		}
+	if((PongRec = malloc(sizeof *PongRec))) {
+		PongRec->MB = 1;
+		PongRec->ME = 1;
+		PongRec->CF = 0;
+		PongRec->IL = 0;
+		PongRec->TNF = 2;
+		PongRec->SR = 1;
+		PongRec->type = (uint8_t *)"text/plain";
+		PongRec->type_length = strlen((char *)PongRec->type);
+		PongRec->payload = (uint8_t *)"Pong";
+		PongRec->payload_length = strlen((char *)PongRec->payload);
+	}
 
 
-    for(teller=0; teller<5; teller++ ) {
-    /************************* Sending Ping ***************************************/
+
+    /************************* Sending Ping 5 times ***************************************/
+	for(teller=0; teller<5; teller++ ) {
 		int len = snep_pack(PingRec, send_buffer);
 
 		llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
@@ -82,7 +85,7 @@ snep_service_thread (void *arg) {
 		}
     }
 
-    /************************* Sending Pong ***************************************/
+    /************************* Sending Pong 1 time ***************************************/
 	int len = snep_pack(PongRec, send_buffer);
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
@@ -99,7 +102,7 @@ snep_service_thread (void *arg) {
 	}
 
 
-    /************************* Receiving Plong ***************************************/
+    /************************* Receiving Plong 5 times ***************************************/
 
 	for(teller=0; teller<5; teller++) {
 		//int len;
@@ -141,16 +144,30 @@ snep_service_thread (void *arg) {
 	//At 30msec, no errors were ever received.
 	usleep(30000);
 
-    for(teller=0; teller<5; teller++ ) {
-    /************************* Sending Ping ***************************************/
+
+    /************************* Sending Ping 5 times ***************************************/
+	for(teller=0; teller<5; teller++ ) {
 		int len = snep_pack(PingRec, send_buffer);
 
 		llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
+
+		// begin
+		gettimeofday(&tvBegin, NULL);
+		timeval_print(&tvBegin);
+
 		llc_connection_send (connection, send_buffer, len);
 
 		//Receiving the SNEP Success response!
 		if ((len = llc_connection_recv (connection, res_buffer, sizeof (res_buffer), NULL)) < 0)
 				return NULL;
+		//end
+		gettimeofday(&tvEnd, NULL);
+		timeval_print(&tvEnd);
+
+		// diff
+		timeval_subtract(&tvDiff, &tvEnd, &tvBegin);
+		printf("Difference: seconds: %ld . usecs: %06ld\n", tvDiff.tv_sec, tvDiff.tv_usec);
+
 		struct snep_message *msg = snep_unpack(res_buffer, len);
 		if(msg->type_field == RESPONSE_SUCCESS) {
 			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "SNEP Response: Success" );
@@ -159,7 +176,7 @@ snep_service_thread (void *arg) {
 		}
     }
 
-    /************************* Sending Pong ***************************************/
+    /************************* Sending Pong 1 time ***************************************/
 	len = snep_pack(PongRec, send_buffer);
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
@@ -176,7 +193,7 @@ snep_service_thread (void *arg) {
 	}
 
 
-    /************************* Receiving Plong ***************************************/
+    /************************* Receiving Plong 5 times ***************************************/
 
 	for(teller=0; teller<5; teller++) {
 		//int len;
@@ -224,3 +241,23 @@ snep_service_thread (void *arg) {
 
 }
 
+/* Return 1 if the difference is negative, otherwise 0.  */
+int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1)
+{
+    long int diff = (t2->tv_usec + 1000000 * t2->tv_sec) - (t1->tv_usec + 1000000 * t1->tv_sec);
+    result->tv_sec = diff / 1000000;
+    result->tv_usec = diff % 1000000;
+
+    return (diff<0);
+}
+
+void timeval_print(struct timeval *tv)
+{
+    char buffer[30];
+    time_t curtime;
+
+    printf("%ld.%06ld", tv->tv_sec, tv->tv_usec);
+    curtime = tv->tv_sec;
+    strftime(buffer, 30, "%m-%d-%Y  %T", localtime(&curtime));
+    printf(" = %s.%06ld\n", buffer, tv->tv_usec);
+}

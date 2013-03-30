@@ -9,5 +9,7 @@
 #define SNEP_SERVICE_THREAD_H_
 
 void *snep_service_thread (void *arg);
+int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1);
+void timeval_print(struct timeval *tv);
 
 #endif /* SNEP_SERVICE_THREAD_H_ */
