@@ -23,9 +23,16 @@
 
 #include "llcp_log.h"
 
+static nfc_context *context;
+
 int main (int argc, char *argv[])
 {
-	nfc_init(NULL);
+	nfc_init(&context);
+	  if (context == NULL) {
+		printf("Unable to init libnfc (malloc)");
+		exit(EXIT_FAILURE);
+	  }
+
 
 	if (llcp_init () < 0)
 	errx (EXIT_FAILURE, "llcp_init()");
@@ -59,10 +66,10 @@ int main (int argc, char *argv[])
 	nfc_device *device;
 
 	//if (!(device = nfc_open (NULL, device_connstring[0]))) {
-	if (!(device = nfc_open (NULL, "pn532_uart:/dev/ttyUSB0:115200"))) {
-		errx (EXIT_FAILURE, "Cannot connect to NFC device");
+	//Device = nfc_open (NULL, "pn532_uart:/dev/ttyUSB0:115200"))) {
+	if (!(device = nfc_open (context, NULL))) {
+			errx (EXIT_FAILURE, "Cannot connect to NFC device");
 	}
-
 
 	//Create llc_link
 	struct llc_link *my_llc_link = llc_link_new ();
@@ -99,7 +106,7 @@ int main (int argc, char *argv[])
 	nfc_close (device);
 
 	llcp_fini ();
-	nfc_exit(NULL);
+	nfc_exit(context);
 	exit(EXIT_SUCCESS);
 
 }
