@@ -7,7 +7,7 @@
 
 #include "ndef.h"
 #include <sys/types.h>
-
+#include "snep.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,7 +41,7 @@ struct ndef_record *ndef_unpack(const uint8_t *buffer, size_t len) {
 
 		if(record->SR == 0 ) {
 			//This is not a short record => payload length = 32bit!
-			record->payload_length = ReadUint32FromBuffer(buffer[2]);
+			record->payload_length = ReadUint32FromBuffer(&buffer[2]);
 			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_INFO, "[ndef.c] Payload length (normal record): %i", record->payload_length);
 			payload_length_size = 4;
 		}

@@ -10,6 +10,7 @@
 
 #include <sys/types.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <stdint.h>
 #define SR_MASK 		0b00010000
