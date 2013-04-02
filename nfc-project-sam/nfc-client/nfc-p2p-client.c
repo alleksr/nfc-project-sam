@@ -80,13 +80,12 @@ int main (int argc, char *argv[])
 
 	//Create sending service
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating SNEP Send Service");
-	int sap = 0;
-	if (!(snep_service = llc_service_new_with_uri (NULL, snep_send_thread, LLCP_SNEP_URI, NULL))) errx (EXIT_FAILURE, "Cannot create snep_send service");
+	int local_sap = 0;
+	if (!(snep_service = llc_service_new(NULL, snep_send_thread, NULL))) errx (EXIT_FAILURE, "Cannot create snep_send service");
 		//Bind llc_service to llc_link
-		if ((sap = llc_link_service_bind (my_llc_link, snep_service, -1)) < 0) {
+		if ((local_sap = llc_link_service_bind (my_llc_link, snep_service, SAP_AUTO)) < 0) {
 			errx (EXIT_FAILURE, "llc_service_new_with_uri()");
 	}
-
 
 
 	//Create mac_link
@@ -103,7 +102,7 @@ int main (int argc, char *argv[])
 	//Create outgoing connection to send data
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "Creating outgoing connection");
-	struct llc_connection * con = llc_outgoing_data_link_connection_new_by_uri (my_llc_link, sap, LLCP_SNEP_URI);
+	struct llc_connection * con = llc_outgoing_data_link_connection_new_by_uri (my_llc_link, local_sap, LLCP_SNEP_URI);
 	if (!con)
 		errx (EXIT_FAILURE, "Cannot create llc_connection");
 
@@ -122,6 +121,8 @@ int main (int argc, char *argv[])
 
 	mac_link_free (my_mac_link);
 	llc_link_free (my_llc_link);
+
+
 
 	nfc_close (device);
 
