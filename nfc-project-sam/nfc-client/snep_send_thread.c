@@ -76,7 +76,7 @@ snep_send_thread (void *arg) {
     uint8_t out_buffer[1024];
 
     int i=0;
-    for(i=0; i<5; i++) {
+    for(i=0; i<3; i++) {
 
     	/************************* Sending Ping ***************************************/
 
@@ -139,7 +139,7 @@ snep_send_thread (void *arg) {
 
 		usleep(25000);
 
-    } //end for i=0..5
+    } //end for i=0..3
 
 
     llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] sending disc pdu");
