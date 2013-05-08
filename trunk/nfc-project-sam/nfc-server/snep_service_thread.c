@@ -18,9 +18,11 @@
 #include "ndef.h"
 #include "snep_service_thread.h"
 
+
 //To enable the llcp_log_log function.
 //Must be defined before the include of llcp_log.h !!!!!!!!!!!!
 #define DEBUG 1
+#define LOOP_COUNT 10
 
 #include "llcp_log.h"
 
@@ -35,6 +37,10 @@ snep_service_thread (void *arg) {
     uint8_t res_buffer[1024];
     int teller, loop, len;
     struct snep_message *msg;
+    struct timeval timelogs[LOOP_COUNT];
+    struct timeval t1, t2;
+    long averageDelay;
+
 
     struct ndef_record *PingRec;
 	if((PingRec = malloc(sizeof *PingRec))) {
@@ -46,9 +52,17 @@ snep_service_thread (void *arg) {
 		PingRec->SR = 1;
 		PingRec->type = (uint8_t *)"text/plain";
 		PingRec->type_length = strlen((char *)PingRec->type);
+		//PingRec->payload = (uint8_t *)"Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping";
 		//PingRec->payload = (uint8_t *)"Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping Ping";
-		PingRec->payload = (uint8_t *)"Ping";
+		//PingRec->payload = (uint8_t *)"25 bytes Ping -----------";
+		//PingRec->payload = (uint8_t *)"50 bytes Ping ----------- 50 bytes Ping ----------";
+		//PingRec->payload = (uint8_t *)"75 bytes Ping ----------- 75 bytes Ping ---------- 75 bytes Ping ----------";
+		//PingRec->payload = (uint8_t *)"100 bytes Ping ---------- 100 bytes Ping --------- 100 bytes Ping --------- 100 bytes Ping ---------";
+		//PingRec->payload = (uint8_t *)"150 bytes Ping ----------- 150 bytes Ping --------- 150 bytes Ping --------- 150 bytes Ping --------- 150 bytes Ping --------- 150 bytes Ping --------";
+		//PingRec->payload = (uint8_t *)"200 bytes Ping ---------- 200 bytes Ping --------- 200 bytes Ping --------- 200 bytes Ping --------- 200 bytes Ping --------- 200 bytes Ping --------- 200 bytes Ping --------- 200 bytes Ping ---------";
+		PingRec->payload = (uint8_t *)"MAX bytes Ping ---------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping --------- MAX bytes Ping -------------";
 		PingRec->payload_length = strlen((char *)PingRec->payload);
+
 	}
 
 	struct ndef_record *PongRec;
@@ -65,18 +79,21 @@ snep_service_thread (void *arg) {
 		PongRec->payload_length = strlen((char *)PongRec->payload);
 	}
 
-
-	for(loop=0; loop<3; loop++) {
+	for(loop=0; loop<LOOP_COUNT; loop++) {
 		/************************* Sending Ping 1 times ***************************************/
 		for(teller=0; teller<1; teller++ ) {
 			int len = snep_pack(PingRec, send_buffer);
 
 			llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] Sending data");
+
+		gettimeofday(&t1, NULL);
 			llc_connection_send (connection, send_buffer, len);
 
 			//Receiving the SNEP Success response!
 			if ((len = llc_connection_recv (connection, res_buffer, sizeof (res_buffer), NULL)) < 0)
 					return NULL;
+		gettimeofday(&t2, NULL);
+		timeval_subtract(&timelogs[loop], &t2, &t1);
 			struct snep_message *msg = snep_unpack(res_buffer, len);
 			if(msg->type_field == RESPONSE_SUCCESS) {
 				llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_DEBUG, "SNEP Response: Success" );
@@ -126,15 +143,22 @@ snep_service_thread (void *arg) {
 		//As a result, the phone will answer with a frame rejected. At 20msec, such a frame is received rarely.
 		//At 30msec, no errors were ever received.
 		usleep(30000);
-
 	}
 
+	llcp_log_log("\n[TIME]", LLC_PRIORITY_NOTICE, "Printing time logs:");
+	for(loop=0; loop<LOOP_COUNT; loop++) {
+		timeval_print(&timelogs[loop]);
+		averageDelay += timelogs[loop].tv_usec;
+	}
+	llcp_log_log("\n[TIME]", LLC_PRIORITY_NOTICE, "Average delay = %lu µs", averageDelay/LOOP_COUNT);
+	llcp_log_log("[TIME]", LLC_PRIORITY_NOTICE, "Size payload = %u bytes\n", PingRec->payload_length);
 
 	llcp_log_log("[nfc-p2p-demo.c]", LLC_PRIORITY_FATAL, "[snep_send_thread] sending disc pdu");
 
 	struct pdu *disc_pdu = pdu_new(connection->remote_sap, PDU_DISC, connection->local_sap, 0, 0, 0, 0);
 
 	llc_connection_send_pdu(connection, disc_pdu);
+
 
     return NULL;
 
@@ -147,7 +171,7 @@ int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval 
     result->tv_sec = diff / 1000000;
     result->tv_usec = diff % 1000000;
 
-    return (diff<0);
+    return 0;
 }
 
 void timeval_print(struct timeval *tv)
@@ -157,5 +181,5 @@ void timeval_print(struct timeval *tv)
 
     curtime = tv->tv_sec;
     strftime(buffer, 30, "%m-%d-%Y  %T", localtime(&curtime));
-    //llcp_log_log("[TIME]", LLC_PRIORITY_NOTICE, "%s.%06ld\n", buffer, tv->tv_usec);
+    llcp_log_log("[TIME]", LLC_PRIORITY_NOTICE, "%s.%06ld", buffer, tv->tv_usec);
 }

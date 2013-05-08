@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
 	nfc_device *device;
 
 	//if (!(device = nfc_open (NULL, device_connstring[0]))) {
-	//Device = nfc_open (NULL, "pn532_uart:/dev/ttyUSB0:115200"))) {
+	//if (!(device = nfc_open (NULL, "pn532_uart:/dev/ttyUSB0:115200"))) {
 	if (!(device = nfc_open (context, NULL))) {
 			errx (EXIT_FAILURE, "Cannot connect to NFC device");
 	}
